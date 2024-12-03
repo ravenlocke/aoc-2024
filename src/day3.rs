@@ -15,7 +15,7 @@ fn parse_radix_10(input: &str) -> u64 {
             4 => 53_328,
             5 => 533_328,
             6 => 5_333_328,
-            _ => unreachable!()
+            _ => panic!("unexpected number length to correct for")
 
         }
     };

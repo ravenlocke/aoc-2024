@@ -29,7 +29,33 @@ impl InputParser<'_> {
     }
 }
 
-fn is_safe_list(list: &[i64]) -> bool {
+#[inline(always)]
+fn is_safe_list_pt1(list: &[i64]) -> bool {
+    let mut iterator = list.iter();
+
+    let (mut current, mut next) = (
+        iterator.next().expect("could not retrieve first"),
+        iterator.next().expect("could not retrieve second"),
+    );
+    let initial_delta: i64 = current - next;
+    let negative_delta = if initial_delta == 0 || initial_delta.abs() > 3 {
+        return false;
+    } else {
+        initial_delta.is_negative()
+    };
+
+    for i in iterator {
+        (current, next) = (next, i);
+        let delta = current - next;
+        if (delta == 0) || (delta.is_negative() != negative_delta) || (delta.abs() > 3) {
+            return false;
+        }
+    }
+    true
+}
+
+#[inline(always)]
+fn is_safe_list_pt2(list: &[i64]) -> bool {
     let mut iterator = list.iter().filter(|i| **i != i64::MAX);
 
     let (mut current, mut next) = (
@@ -53,13 +79,14 @@ fn is_safe_list(list: &[i64]) -> bool {
     true
 }
 
+
 pub fn part1(contents: &str) -> usize {
     let mut count = 0usize;
     let mut list = vec![];
     let mut parser = InputParser::new(contents);
 
     while parser.parse_next(&mut list) {
-        if is_safe_list(&list) {
+        if is_safe_list_pt1(&list) {
             count += 1
         }
         list.clear();
@@ -77,7 +104,7 @@ pub fn part2(contents: &str) -> usize {
         if (0..list.len()).any(|idx| {
             let removed = list[idx];
             list[idx] = i64::MAX;
-            let to_return = is_safe_list(&list);
+            let to_return = is_safe_list_pt2(&list);
             list[idx] = removed;
             to_return
         }) {
